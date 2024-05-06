@@ -1,0 +1,84 @@
+.sign-in-container {
+  background: linear-gradient(71.17deg, #FEAF00 19.35%, #F8D442 90.12%);
+  height: 750px;
+  display: flex;
+  justify-content: center;
+}
+.sign-in-container .sign-in-form {
+  background: #FFFFFF;
+  padding: 6px;
+  width: 430px;
+  margin: auto;
+  border: 1px solid #CCCCCC;
+  border-radius: 20px;
+}
+.sign-in-container .sign-in-form .heading {
+  color: #000000;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+}
+.sign-in-container .sign-in-form .form-container {
+  padding: 20px;
+}
+.sign-in-container .sign-in-form .form-container .title {
+  padding: 10px 0;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
+.sign-in-container .sign-in-form .form-container .error-message {
+  color: red;
+  text-align: center;
+}
+.sign-in-container .sign-in-form .form-container .info-message {
+  color: #6C6C6C;
+  font-size: 12px;
+  text-align: center;
+}
+.sign-in-container .sign-in-form .form-container form .form-field {
+  margin-bottom: 20px;
+}
+.sign-in-container .sign-in-form .form-container form .form-field label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  color: #6C6C6C;
+}
+.sign-in-container .sign-in-form .form-container form .form-field input {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #CCCCCC;
+  border-radius: 5px;
+}
+.sign-in-container .sign-in-form .form-container form .form-field input:focus {
+  border-color: #63b3ed;
+  outline: 0;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+.sign-in-container .sign-in-form .form-container form .submit-button {
+  width: 100%;
+  padding: 10px;
+  color: #FFFFFF;
+  background: #FEAF00;
+  border: none;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+.sign-in-container .sign-in-form .form-container form .submit-button:hover {
+  background: #F8D442;
+}
+.sign-in-container .sign-in-form .form-container form .forgot-password {
+  margin-top: 10px;
+  color: #6C6C6C;
+  text-align: center;
+}
+.sign-in-container .sign-in-form .form-container form .forgot-password a {
+  color: #FEAF00;
+  text-decoration: underline;
+}
+.sign-in-container .sign-in-form .form-container form .forgot-password a:hover {
+  text-decoration: none;
+}/*# sourceMappingURL=SignIn.css.map */

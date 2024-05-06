@@ -1,7 +1,4 @@
 import React, { useState, useEffect,useRef } from "react";
-import { LiaPlayCircle } from "react-icons/lia";
-import { GoBell } from "react-icons/go";
-import { PiCaretUpDownFill } from "react-icons/pi";
 import { Button, Divider, Radio, Table, Avatar, Modal ,Form, Input,} from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
@@ -44,7 +41,7 @@ const StudentForm = ({ visible, onCancel }) => {
       .then((response) => {
         console.log("Form submitted successfully:", response.data);
         setLoading(false);
-        onCancel();
+        onCancel(); 
       })
       .catch((error) => {
         console.error("Error submitting form:", error);
@@ -65,7 +62,7 @@ const StudentForm = ({ visible, onCancel }) => {
         <Button key="cancel" onClick={onCancel}>
           Cancel
         </Button>,
-        <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
+        <Button key="submit" type="primary" onClick={handleOk}>
           Submit
         </Button>,
       ]}
