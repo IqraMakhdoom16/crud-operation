@@ -12,7 +12,6 @@ const SignIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Validate email and password
       if (!email.trim()) {
         setError("Please enter your email");
         return;
@@ -26,24 +25,20 @@ const SignIn = () => {
         password: password,
       };
 
-      // If validations pass, make API call
       const response = await axios.post(
         "https://api.freeapi.app/api/v1/users/login",
         body
       );
 
-      // Check if login is successful
       if (response.status === 200) {
         navigate("/student-table");
         setResponse(response.data);
         localStorage.setItem('userData', JSON.stringify(response.data));
         setError("");
-        // Handle successful login, maybe store token in localStorage or state
       } else {
         setError("Invalid email or password");
       }
     } catch (error) {
-      // Handle API errors
       setError("Something went wrong. Please try again later.");
     }
   };

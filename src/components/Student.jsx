@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Button, Table, Modal, Form, Input } from "antd";
 import axios from "axios";
 
-const columns = (handleDelete, fetchTodos) => [
+const columns = (handleDelete, fetchTodos, handleEdit) => [
   {
     title: "Title",
     dataIndex: "title",
@@ -17,7 +17,7 @@ const columns = (handleDelete, fetchTodos) => [
     dataIndex: "actions",
     render: (text, record) => (
       <>
-        <Button type="primary" onClick={() => handleEdit(record.id)}>
+        <Button type="primary" onClick={() => handleEdit(record)}>
           Edit
         </Button>
         <Button
@@ -31,13 +31,86 @@ const columns = (handleDelete, fetchTodos) => [
   },
 ];
 
-const StudentForm = ({ visible, onCancel, setUserData, fetchTodos }) => {
+const EditForm = ({ visible, onCancel, onSubmit, currentTodo }) => {
+  const formRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  console.log("edit for data", currentTodo);
+
+  const handleSubmit = (values) => {
+    if (!currentTodo) {
+      console.error(
+        "Current todo is undefined. Cannot proceed with the update."
+      );
+      return;
+    }
+    setLoading(true);
+    axios
+      .patch(`https://api.freeapi.app/api/v1/todos/${currentTodo._id}`, values)
+      .then((response) => {
+        console.log("Todo updated successfully:", response.data);
+        setLoading(false);
+        onCancel();
+        onSubmit(values); 
+      })
+      .catch((error) => {
+        console.error("Error updating todo:", error);
+        setLoading(false);
+      });
+  };
+
+  const handleOk = () => {
+    formRef.current.submit();
+  };
+
+  return (
+    <Modal
+      title="Update Todo"
+      visible={visible}
+      onCancel={onCancel}
+      footer={[
+        <Button key="cancel" onClick={onCancel}>
+          Cancel
+        </Button>,
+        <Button
+          key="submit"
+          type="primary"
+          loading={loading}
+          onClick={handleOk}
+        >
+          Submit
+        </Button>,
+      ]}
+    >
+      {currentTodo && (
+        <Form onFinish={handleSubmit} ref={formRef} initialValues={currentTodo}>
+          <Form.Item
+            label="Title"
+            value={currentTodo.title}
+            name="title"
+            rules={[{ required: true, message: "Please enter title" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Description"
+            name="description"
+            value={currentTodo.description}
+            rules={[{ required: true, message: "Please enter Description" }]}
+          >
+            <Input />
+          </Form.Item>
+        </Form>
+      )}
+    </Modal>
+  );
+};
+
+const StudentForm = ({ visible, onCancel, currentTodo, fetchTodos }) => {
   const formRef = useRef(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = (values) => {
     setLoading(true);
-    // Send POST request with form data
     axios
       .post("https://api.freeapi.app/api/v1/todos", values)
       .then((response) => {
@@ -96,12 +169,11 @@ const StudentForm = ({ visible, onCancel, setUserData, fetchTodos }) => {
 };
 const handleDelete = (id, fetchTodos) => {
   console.log("id is", id);
-  // Send DELETE request to delete todo with specified id
   axios
     .delete(`https://api.freeapi.app/api/v1/todos/${id}`)
     .then((response) => {
-      console.log("Todo deleted successfully:", id);
-      fetchTodos(); // Fetch todos again to update the list
+      console.log(response,"Todo deleted successfully:", id);
+      fetchTodos();
     })
     .catch((error) => {
       console.error("Error deleting todo:", error);
@@ -111,8 +183,9 @@ const handleDelete = (id, fetchTodos) => {
 export default function Student() {
   const [userData, setUserData] = useState([]);
   const [visible, setVisible] = useState(false);
+  const [editVisible, setEditVisible] = useState(false);
+  const [currentTodo, setCurrentTodo] = useState(null);
 
-  // Function to fetch todos initially
   const fetchTodos = () => {
     axios
       .get("https://api.freeapi.app/api/v1/todos")
@@ -126,8 +199,8 @@ export default function Student() {
   };
 
   useEffect(() => {
-    fetchTodos(); // Fetch todos initially
-  }, []); // Empty dependency array to fetch todos only once
+    fetchTodos(); 
+  }, []); 
 
   const showModal = () => {
     setVisible(true);
@@ -138,10 +211,17 @@ export default function Student() {
   };
 
   const handleEdit = (record) => {
-    // Implement edit functionality here
-    console.log("Editing todo:", record);
+    setCurrentTodo(record);
+    setEditVisible(true);
   };
 
+  const handleEditCancel = () => {
+    setEditVisible(false);
+  };
+
+  const handleEditSubmit = () => {
+    fetchTodos(); 
+  };
   return (
     <>
       <div className="bg-[#f8f8f8] py-10 min-h-screen flex px-[5%] justify-center">
@@ -158,14 +238,20 @@ export default function Student() {
             <StudentForm
               visible={visible}
               onCancel={handleCancel}
-              setUserData={setUserData} // Pass setter function as prop
-              fetchTodos={fetchTodos} // Pass fetchTodos function as prop
+              setUserData={setUserData}
+              fetchTodos={fetchTodos} 
+            />
+            <EditForm
+              visible={editVisible}
+              onCancel={handleEditCancel}
+              onSubmit={handleEditSubmit}
+              currentTodo={currentTodo}
             />
           </div>
           <hr className="mt-5" />
           <div>
             <Table
-              columns={columns(handleDelete, fetchTodos)}
+              columns={columns(handleDelete, fetchTodos, handleEdit)}
               dataSource={userData}
               rowClassName="mt-5 py-5"
             />
