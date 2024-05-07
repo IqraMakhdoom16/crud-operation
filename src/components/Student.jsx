@@ -1,35 +1,37 @@
-import React, { useState, useEffect,useRef } from "react";
-import { Button, Divider, Radio, Table, Avatar, Modal ,Form, Input,} from "antd";
-import { UserOutlined } from "@ant-design/icons";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import React, { useState, useEffect, useRef } from "react";
+import { Button, Table, Modal, Form, Input } from "antd";
 import axios from "axios";
 
-
-const columns = [
+const columns = (handleDelete, fetchTodos) => [
   {
-    title: "Name",
-    dataIndex: "firstName",
+    title: "Title",
+    dataIndex: "title",
     render: (text) => <a>{text}</a>,
   },
   {
-    title: "Email",
-    dataIndex: "email",
+    title: "Description",
+    dataIndex: "description",
   },
   {
-    title: "Phone Number",
-    dataIndex: "phone",
-  },
-  {
-    title: "Roll Number",
-    dataIndex: "ein",
-  },
-  {
-    title: "University",
-    dataIndex: "university",
+    title: "Actions",
+    dataIndex: "actions",
+    render: (text, record) => (
+      <>
+        <Button type="primary" onClick={() => handleEdit(record.id)}>
+          Edit
+        </Button>
+        <Button
+          type="danger"
+          onClick={() => handleDelete(record._id, fetchTodos)}
+        >
+          Delete
+        </Button>
+      </>
+    ),
   },
 ];
 
-const StudentForm = ({ visible, onCancel }) => {
+const StudentForm = ({ visible, onCancel, setUserData, fetchTodos }) => {
   const formRef = useRef(null);
   const [loading, setLoading] = useState(false);
 
@@ -37,11 +39,12 @@ const StudentForm = ({ visible, onCancel }) => {
     setLoading(true);
     // Send POST request with form data
     axios
-      .post("https://dummyjson.com/users/add", values)
+      .post("https://api.freeapi.app/api/v1/todos", values)
       .then((response) => {
         console.log("Form submitted successfully:", response.data);
         setLoading(false);
-        onCancel(); 
+        onCancel();
+        fetchTodos();
       })
       .catch((error) => {
         console.error("Error submitting form:", error);
@@ -62,47 +65,28 @@ const StudentForm = ({ visible, onCancel }) => {
         <Button key="cancel" onClick={onCancel}>
           Cancel
         </Button>,
-        <Button key="submit" type="primary" onClick={handleOk}>
+        <Button
+          key="submit"
+          type="primary"
+          loading={loading}
+          onClick={handleOk}
+        >
           Submit
         </Button>,
       ]}
     >
       <Form onFinish={handleSubmit} ref={formRef}>
         <Form.Item
-          label="Name"
-          name="name"
-          rules={[{ required: true, message: "Please enter name" }]}
+          label="Title"
+          name="title"
+          rules={[{ required: true, message: "Please enter title" }]}
         >
           <Input />
         </Form.Item>
         <Form.Item
-          label="Email"
-          name="email"
-          rules={[
-            { required: true, message: "Please enter email" },
-            { type: "email", message: "Please enter a valid email" },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Phone Number"
-          name="phone"
-          rules={[{ required: true, message: "Please enter phone number" }]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Roll Number"
-          name="rollNumber"
-          rules={[{ required: true, message: "Please enter roll number" }]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="University"
-          name="university"
-          rules={[{ required: true, message: "Please enter university" }]}
+          label="Description"
+          name="description"
+          rules={[{ required: true, message: "Please enter Description" }]}
         >
           <Input />
         </Form.Item>
@@ -110,11 +94,40 @@ const StudentForm = ({ visible, onCancel }) => {
     </Modal>
   );
 };
+const handleDelete = (id, fetchTodos) => {
+  console.log("id is", id);
+  // Send DELETE request to delete todo with specified id
+  axios
+    .delete(`https://api.freeapi.app/api/v1/todos/${id}`)
+    .then((response) => {
+      console.log("Todo deleted successfully:", id);
+      fetchTodos(); // Fetch todos again to update the list
+    })
+    .catch((error) => {
+      console.error("Error deleting todo:", error);
+    });
+};
+
 export default function Student() {
-  const [open, setOpen] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
   const [userData, setUserData] = useState([]);
   const [visible, setVisible] = useState(false);
+
+  // Function to fetch todos initially
+  const fetchTodos = () => {
+    axios
+      .get("https://api.freeapi.app/api/v1/todos")
+      .then((response) => {
+        console.log(response.data);
+        setUserData(response.data.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching user data:", error);
+      });
+  };
+
+  useEffect(() => {
+    fetchTodos(); // Fetch todos initially
+  }, []); // Empty dependency array to fetch todos only once
 
   const showModal = () => {
     setVisible(true);
@@ -123,36 +136,10 @@ export default function Student() {
   const handleCancel = () => {
     setVisible(false);
   };
-  useEffect(() => {
-    // Make Axios GET request
-    axios
-      .get("https://dummyjson.com/users")
-      .then((response) => {
-        setUserData(response.data.users); // Set user data to state
-      })
-      .catch((error) => {
-        console.error("Error fetching user data:", error);
-      });
-  }, []);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-  console.log("userdata", userData.users);
-
-  const handleOk = () => {
-    setModalText("The modal will be closed after two seconds");
-    setConfirmLoading(true);
-    setTimeout(() => {
-      setOpen(false);
-      setConfirmLoading(false);
-    }, 2000);
+  const handleEdit = (record) => {
+    // Implement edit functionality here
+    console.log("Editing todo:", record);
   };
 
   return (
@@ -166,30 +153,25 @@ export default function Student() {
               className="bg-[#FEAF00] uppercase px-5 hover:bg-[#624c1e] "
               type="primary"
             >
-              Add New Student
+              Add Todo
             </Button>
-            <StudentForm visible={visible} onCancel={handleCancel} />
+            <StudentForm
+              visible={visible}
+              onCancel={handleCancel}
+              setUserData={setUserData} // Pass setter function as prop
+              fetchTodos={fetchTodos} // Pass fetchTodos function as prop
+            />
           </div>
           <hr className="mt-5" />
           <div>
             <Table
-              columns={columns}
+              columns={columns(handleDelete, fetchTodos)}
               dataSource={userData}
               rowClassName="mt-5 py-5"
             />
           </div>
-         
         </div>
       </div>
-      <Modal
-        title="Enter Student Data"
-        open={open}
-        onOk={handleOk}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}
-      >
-        <div></div>
-      </Modal>
     </>
   );
 }
