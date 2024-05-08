@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import {start, stop, login} from "../components/appSlice"
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -24,7 +25,8 @@ const SignIn = () => {
         username: email,
         password: password,
       };
-
+      
+      dispatch(start());
       const response = await axios.post(
         "https://api.freeapi.app/api/v1/users/login",
         body
@@ -33,10 +35,20 @@ const SignIn = () => {
       if (response.status === 200) {
         navigate("/student-table");
         setResponse(response.data);
-        localStorage.setItem('userData', JSON.stringify(response.data));
+        if (response?.data?.token) {
+          dispatch(
+            login({
+              user: response?.data?.user,
+              token: response?.data?.token,
+            })
+          );
+          localStorage.setItem("access_token", response?.data?.token);
+        }
         setError("");
+        dispatch(stop());
       } else {
         setError("Invalid email or password");
+        dispatch(stop());
       }
     } catch (error) {
       setError("Something went wrong. Please try again later.");
