@@ -1,16 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  value: 0,
   user: null,
-  error: null,
   token: localStorage.getItem("access_token") ?? null,
-  isLoading: false,
-  isSidebar: false,
-  currentCategory: null,
-  favouriteCategories: [],
-  bookmarks: [],
-  currentAsset: {}
 };
 
 export const appSlice = createSlice({
@@ -43,27 +35,6 @@ export const appSlice = createSlice({
     setError: (state, action) => {
       state.error = action.payload;
     },
-    sidebar: (state) => {
-      state.isSidebar = !state.isSidebar;
-    },
-      setCurrentCategory: (state, action) => {
-          return {
-              ...state,
-              currentCategory: action.payload
-          };
-      },
-    setFavouriteCategories: (state, action) => {
-      state.favouriteCategories = action.payload
-    },
-    setBookmarks:(state,action) =>{
-      state.bookmarks = action.payload
-    },
-    setAsset:(state,action) =>{
-      return {
-        ...state,
-        currentAsset: action.payload
-      };
-    }
   },
 });
 

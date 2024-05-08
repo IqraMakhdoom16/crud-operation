@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import {start, stop, login} from "../components/appSlice"
+import { start, stop, login } from "./appSlice";
+import { useDispatch } from "react-redux";
 
 const SignIn = () => {
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [response,setResponse]=useState([]);
-  const navigate=useNavigate();
+  const [response, setResponse] = useState([]);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,28 +27,31 @@ const SignIn = () => {
         username: email,
         password: password,
       };
-      
-      dispatch(start());
-      const response = await axios.post(
-        "https://api.freeapi.app/api/v1/users/login",
-        body
-      );
 
-      if (response.status === 200) {
-        navigate("/student-table");
+      try {
+        dispatch(start());
+        const response = await axios.post(
+          "https://api.freeapi.app/api/v1/users/login",
+          body
+        );
         setResponse(response.data);
-        if (response?.data?.token) {
+        if (response?.data) {
+          console.log("im here");
           dispatch(
             login({
-              user: response?.data?.user,
-              token: response?.data?.token,
+              user: response?.data?.data?.user,
+              token: response?.data?.data?.accessToken,
             })
           );
-          localStorage.setItem("access_token", response?.data?.token);
+          console.log("Response data:", response.data.data?.accessToken);
+
+          console.log("userdata is", response?.data?.data?.user);
+          localStorage.setItem("access_token", response?.data?.data?.accessToken);
         }
         setError("");
         dispatch(stop());
-      } else {
+        navigate("/student-table");
+      } catch (error) {
         setError("Invalid email or password");
         dispatch(stop());
       }
@@ -62,7 +67,7 @@ const SignIn = () => {
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
   };
-  console.log("user response",response);
+  console.log("user response", response);
 
   return (
     <>
