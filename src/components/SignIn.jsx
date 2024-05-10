@@ -14,8 +14,6 @@ const schema = Yup.object().shape({
     .min(8, "Password must be at least 8 characters"),
 });
 
-
-
 const SignIn = () => {
   const dispatch = useDispatch();
   const [response, setResponse] = useState([]);
@@ -24,7 +22,7 @@ const SignIn = () => {
   const handleSubmit = async (values) => {
     try {
       const body = {
-        username: values.email,
+        email: values.email,
         password: values.password,
       };
 
