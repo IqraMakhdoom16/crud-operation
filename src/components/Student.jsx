@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button, Table, Modal, Form, Input } from "antd";
+import { Button, Table, Modal, Form, Input, Popconfirm, Select } from "antd";
 import axios from "axios";
+
+const { Option } = Select;
 
 const columns = (handleDelete, fetchTodos, handleEdit) => [
   {
-    title: "Title",
+    title: "Student Name",
     dataIndex: "title",
     render: (text) => <a>{text}</a>,
   },
   {
-    title: "Description",
+    title: "Class",
     dataIndex: "description",
   },
   {
@@ -20,12 +22,16 @@ const columns = (handleDelete, fetchTodos, handleEdit) => [
         <Button type="primary" onClick={() => handleEdit(record)}>
           Edit
         </Button>
-        <Button
-          type="danger"
-          onClick={() => handleDelete(record._id, fetchTodos)}
+        <Popconfirm
+          title="Delete the task"
+          description="Are you sure to delete this task?"
+          onConfirm={() => handleDelete(record._id, fetchTodos)}
+          onCancel={null}
+          okText="Yes"
+          cancelText="No"
         >
-          Delete
-        </Button>
+          <Button type="danger">Delete</Button>
+        </Popconfirm>
       </>
     ),
   },
@@ -50,7 +56,7 @@ const EditForm = ({ visible, onCancel, onSubmit, currentTodo }) => {
         console.log("Todo updated successfully:", response.data);
         setLoading(false);
         onCancel();
-        onSubmit(values); 
+        onSubmit(values);
       })
       .catch((error) => {
         console.error("Error updating todo:", error);
@@ -71,12 +77,7 @@ const EditForm = ({ visible, onCancel, onSubmit, currentTodo }) => {
         <Button key="cancel" onClick={onCancel}>
           Cancel
         </Button>,
-        <Button
-          key="submit"
-          type="primary"
-          loading={loading}
-          onClick={handleOk}
-        >
+        <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
           Submit
         </Button>,
       ]}
@@ -84,20 +85,20 @@ const EditForm = ({ visible, onCancel, onSubmit, currentTodo }) => {
       {currentTodo && (
         <Form onFinish={handleSubmit} ref={formRef} initialValues={currentTodo}>
           <Form.Item
-            label="Title"
+            label="Student Name"
             value={currentTodo.title}
             name="title"
             rules={[{ required: true, message: "Please enter title" }]}
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            label="Description"
-            name="description"
-            value={currentTodo.description}
-            rules={[{ required: true, message: "Please enter Description" }]}
-          >
-            <Input />
+          <Form.Item label="Class" name="description">
+            <Select>
+              <Option value="A">A</Option>
+              <Option value="B">B</Option>
+              <Option value="C">C</Option>
+              <Option value="D">D</Option>
+            </Select>
           </Form.Item>
         </Form>
       )}
@@ -105,7 +106,7 @@ const EditForm = ({ visible, onCancel, onSubmit, currentTodo }) => {
   );
 };
 
-const StudentForm = ({ visible, onCancel, currentTodo, fetchTodos }) => {
+const StudentForm = ({ visible, onCancel, fetchTodos }) => {
   const formRef = useRef(null);
   const [loading, setLoading] = useState(false);
 
@@ -138,41 +139,38 @@ const StudentForm = ({ visible, onCancel, currentTodo, fetchTodos }) => {
         <Button key="cancel" onClick={onCancel}>
           Cancel
         </Button>,
-        <Button
-          key="submit"
-          type="primary"
-          loading={loading}
-          onClick={handleOk}
-        >
+        <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
           Submit
         </Button>,
       ]}
     >
       <Form onFinish={handleSubmit} ref={formRef}>
         <Form.Item
-          label="Title"
+          label="Student Name"
           name="title"
           rules={[{ required: true, message: "Please enter title" }]}
         >
           <Input />
         </Form.Item>
-        <Form.Item
-          label="Description"
-          name="description"
-          rules={[{ required: true, message: "Please enter Description" }]}
-        >
-          <Input />
+        <Form.Item label="Class" name="description">
+          <Select>
+            <Option value="A">A</Option>
+            <Option value="B">B</Option>
+            <Option value="C">C</Option>
+            <Option value="D">D</Option>
+          </Select>
         </Form.Item>
       </Form>
     </Modal>
   );
 };
+
 const handleDelete = (id, fetchTodos) => {
   console.log("id is", id);
   axios
     .delete(`https://api.freeapi.app/api/v1/todos/${id}`)
     .then((response) => {
-      console.log(response,"Todo deleted successfully:", id);
+      console.log(response, "Todo deleted successfully:", id);
       fetchTodos();
     })
     .catch((error) => {
@@ -180,6 +178,10 @@ const handleDelete = (id, fetchTodos) => {
     });
 };
 
+const showModal = () => {
+  setCurrentTodo(null); 
+  setVisible(true);
+};
 export default function Student() {
   const [userData, setUserData] = useState([]);
   const [visible, setVisible] = useState(false);
@@ -199,8 +201,8 @@ export default function Student() {
   };
 
   useEffect(() => {
-    fetchTodos(); 
-  }, []); 
+    fetchTodos();
+  }, []);
 
   const showModal = () => {
     setVisible(true);
@@ -220,8 +222,9 @@ export default function Student() {
   };
 
   const handleEditSubmit = () => {
-    fetchTodos(); 
+    fetchTodos();
   };
+
   return (
     <>
       <div className="bg-[#f8f8f8] py-10 min-h-screen flex px-[5%] justify-center">
@@ -235,12 +238,7 @@ export default function Student() {
             >
               Add Todo
             </Button>
-            <StudentForm
-              visible={visible}
-              onCancel={handleCancel}
-              setUserData={setUserData}
-              fetchTodos={fetchTodos} 
-            />
+            <StudentForm visible={visible} onCancel={handleCancel} fetchTodos={fetchTodos} />
             <EditForm
               visible={editVisible}
               onCancel={handleEditCancel}
