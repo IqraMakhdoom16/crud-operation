@@ -4,12 +4,11 @@ import { Button } from "antd";
 import axios from "axios";
 import StudentTable from "./StudentTable";
 import StudentForm from "./StudentForm";
-import EditForm from "./EditForm";
 
 export default function Student() {
   const [userData, setUserData] = useState([]);
   const [visible, setVisible] = useState(false);
-  const [editVisible, setEditVisible] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
   const [currentTodo, setCurrentTodo] = useState(null);
   const [classCounts, setClassCounts] = useState({
     A: 0,
@@ -52,24 +51,18 @@ export default function Student() {
 
   const showModal = () => {
     setVisible(true);
+    setIsEdit(false);
   };
 
   const handleCancel = () => {
     setVisible(false);
+    setCurrentTodo(null);
   };
 
   const handleEdit = (record) => {
     setCurrentTodo(record);
-    setEditVisible(true);
-  };
-
-  const handleEditCancel = () => {
-    setEditVisible(false);
-  };
-
-  const handleEditSubmit = () => {
-    fetchTodos();
-    setEditVisible(false);
+    setIsEdit(true);
+    setVisible(true);
   };
 
   const totalTodos = userData.length;
@@ -146,11 +139,7 @@ export default function Student() {
           visible={visible}
           onCancel={handleCancel}
           fetchTodos={fetchTodos}
-        />
-        <EditForm
-          visible={editVisible}
-          onCancel={handleEditCancel}
-          onSubmit={handleEditSubmit}
+          isEdit={isEdit}
           currentTodo={currentTodo}
         />
         <StudentTable

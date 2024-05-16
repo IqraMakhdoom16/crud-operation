@@ -1,32 +1,55 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Modal, Form, Input, Select, Button } from "antd";
 import axios from "axios";
 
 const { Option } = Select;
 
-const StudentForm = ({ visible, onCancel, fetchTodos }) => {
+const StudentForm = ({ visible, onCancel, fetchTodos, isEdit, currentTodo }) => {
   const formRef = useRef(null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (visible && isEdit && currentTodo) {
+      formRef.current.setFieldsValue({
+        title: currentTodo.title,
+        description: currentTodo.description,
+      });
+    }
+  }, [visible, isEdit, currentTodo]);
+
   const handleSubmit = (values) => {
     setLoading(true);
-    axios
-      .post("https://api.freeapi.app/api/v1/todos", values)
-      .then(() => {
-        setLoading(false);
-        onCancel();
-        fetchTodos();
-        formRef.current.resetFields();
-      })
-      .catch((error) => {
-        console.error("Error submitting form:", error);
-        setLoading(false);
-      });
+    if (isEdit && currentTodo) {
+      axios
+        .patch(`https://api.freeapi.app/api/v1/todos/${currentTodo._id}`, values)
+        .then(() => {
+          setLoading(false);
+          onCancel();
+          fetchTodos();
+        })
+        .catch((error) => {
+          console.error("Error updating todo:", error);
+          setLoading(false);
+        });
+    } else {
+      axios
+        .post(`https://api.freeapi.app/api/v1/todos`, values)
+        .then(() => {
+          setLoading(false);
+          onCancel();
+          fetchTodos();
+          formRef.current.resetFields();
+        })
+        .catch((error) => {
+          console.error("Error submitting form:", error);
+          setLoading(false);
+        });
+    }
   };
 
   return (
     <Modal
-      title="Enter Student Data"
+      title={isEdit ? "Update Student" : "Enter Student Data"}
       visible={visible}
       onCancel={onCancel}
       footer={[
