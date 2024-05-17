@@ -1,4 +1,3 @@
-// Student.js
 import React, { useState, useEffect } from "react";
 import { Button } from "antd";
 import axios from "axios";

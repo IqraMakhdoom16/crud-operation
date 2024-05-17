@@ -1,88 +1,98 @@
-import React, { useRef, useEffect, useState } from "react";
-import { Modal, Form, Input, Select, Button } from "antd";
+import React, { useEffect } from "react";
+import { Modal, Input, Select, Button } from "antd";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 import axios from "axios";
 
 const { Option } = Select;
 
+const validationSchema = Yup.object().shape({
+  title: Yup.string().required("Please enter title"),
+  description: Yup.string().required("Please select class"),
+});
+
 const StudentForm = ({ visible, onCancel, fetchTodos, isEdit, currentTodo }) => {
-  const formRef = useRef(null);
-  const [loading, setLoading] = useState(false);
+  const initialValues = {
+    title: currentTodo?.title || "",
+    description: currentTodo?.description || "",
+  };
+
+  const handleSubmit = (values, { setSubmitting, resetForm }) => {
+    const apiCall = isEdit
+      ? axios.patch(`https://api.freeapi.app/api/v1/todos/${currentTodo._id}`, values)
+      : axios.post(`https://api.freeapi.app/api/v1/todos`, values);
+
+    apiCall
+      .then(() => {
+        setSubmitting(false);
+        onCancel();
+        fetchTodos();
+        if (!isEdit) {
+          resetForm();
+        }
+      })
+      .catch((error) => {
+        console.error("Error submitting form:", error);
+        setSubmitting(false);
+      });
+  };
 
   useEffect(() => {
     if (visible && isEdit && currentTodo) {
-      formRef.current.setFieldsValue({
-        title: currentTodo.title,
-        description: currentTodo.description,
-      });
     }
   }, [visible, isEdit, currentTodo]);
-
-  const handleSubmit = (values) => {
-    setLoading(true);
-    if (isEdit && currentTodo) {
-      axios
-        .patch(`https://api.freeapi.app/api/v1/todos/${currentTodo._id}`, values)
-        .then(() => {
-          setLoading(false);
-          onCancel();
-          fetchTodos();
-        })
-        .catch((error) => {
-          console.error("Error updating todo:", error);
-          setLoading(false);
-        });
-    } else {
-      axios
-        .post(`https://api.freeapi.app/api/v1/todos`, values)
-        .then(() => {
-          setLoading(false);
-          onCancel();
-          fetchTodos();
-          formRef.current.resetFields();
-        })
-        .catch((error) => {
-          console.error("Error submitting form:", error);
-          setLoading(false);
-        });
-    }
-  };
 
   return (
     <Modal
       title={isEdit ? "Update Student" : "Enter Student Data"}
       visible={visible}
       onCancel={onCancel}
-      footer={[
-        <Button key="cancel" onClick={onCancel}>
-          Cancel
-        </Button>,
-        <Button
-          key="submit"
-          type="primary"
-          loading={loading}
-          onClick={() => formRef.current.submit()}
-        >
-          Submit
-        </Button>,
-      ]}
+      footer={null}
     >
-      <Form ref={formRef} onFinish={handleSubmit}>
-        <Form.Item
-          label="Student Name"
-          name="title"
-          rules={[{ required: true, message: "Please enter title" }]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item label="Class" name="description">
-          <Select>
-            <Option value="A">A</Option>
-            <Option value="B">B</Option>
-            <Option value="C">C</Option>
-            <Option value="D">D</Option>
-          </Select>
-        </Form.Item>
-      </Form>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+        enableReinitialize
+      >
+        {({ isSubmitting, setFieldValue, values }) => (
+          <Form>
+            <div className="ant-form-item">
+              <label htmlFor="title" className="ant-form-item-label">
+                <span>Student Name</span>
+              </label>
+              <Field name="title">
+                {({ field }) => <Input {...field} />}
+              </Field>
+              <ErrorMessage name="title" component="div" className="ant-form-item-explain-error" />
+            </div>
+            <div className="ant-form-item">
+              <label htmlFor="description" className="ant-form-item-label">
+                <span>Class</span>
+              </label>
+              <Select
+                value={values.description}
+                onChange={(value) => setFieldValue("description", value)}
+                style={{ width: "100%" }}
+              >
+                <Option value="A">A</Option>
+                <Option value="B">B</Option>
+                <Option value="C">C</Option>
+                <Option value="D">D</Option>
+              </Select>
+              <ErrorMessage name="description" component="div" className="ant-form-item-explain-error" />
+            </div>
+            <div className="ant-modal-footer">
+              <Button onClick={onCancel}>
+                Cancel
+              </Button>
+              <Button type="primary" loading={isSubmitting} htmlType="submit">
+                Submit
+              </Button>
+            </div>
+          </Form>
+        )}
+      </Formik>
     </Modal>
   );
 };
