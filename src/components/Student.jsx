@@ -76,7 +76,7 @@ export default function Student() {
     <div className="bg-[#f8f8f8] py-10 min-h-screen flex px-[5%] justify-center">
       <div className="container">
         <div className="flex gap-10 mb-10">
-          <div className="w-44 bg-[#F0F9FF] border px-5 py-5 h-32 rounded-lg">
+          <div className="w-44 bg-[#F0F9FF] border px-5 py-5 h-35 rounded-lg">
             <div>
               <svg
                 width="48"
@@ -93,13 +93,13 @@ export default function Student() {
               <div className="text-3xl font-semibold text-[#40A3FF]">
                 {totalTodos}
               </div>
-              <div className="text-lg text-[#8db2bf]">Total Students</div>
+              <div className="text-lg text-[#8db2bf] py-3">Total Students</div>
             </div>
           </div>
           {classNames.map((classItem) => (
             <div
               key={classItem.name}
-              className="h-32 px-5 py-5 border rounded-lg w-44"
+              className="px-5 py-5 border rounded-lg h-35 w-44"
               style={{ backgroundColor: classItem.bgColor }}
             >
               <div>
