@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Modal, Input, Select, Button } from "antd";
+import { Input, Select, Button } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
@@ -43,12 +43,7 @@ const StudentForm = ({ visible, onCancel, fetchTodos, isEdit, currentTodo }) => 
   }, [visible, isEdit, currentTodo]);
 
   return (
-    <Modal
-      title={isEdit ? "Update Student" : "Enter Student Data"}
-      visible={visible}
-      onCancel={onCancel}
-      footer={null}
-    >
+   
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -93,7 +88,6 @@ const StudentForm = ({ visible, onCancel, fetchTodos, isEdit, currentTodo }) => 
           </Form>
         )}
       </Formik>
-    </Modal>
   );
 };
 

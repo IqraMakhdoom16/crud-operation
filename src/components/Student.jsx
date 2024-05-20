@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "antd";
+import {Modal, Button } from "antd";
 import axios from "axios";
 import StudentTable from "./StudentTable";
 import StudentForm from "./StudentForm";
@@ -8,6 +8,7 @@ export default function Student() {
   const [userData, setUserData] = useState([]);
   const [visible, setVisible] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [onCancel, setonCancel] = useState();
   const [currentTodo, setCurrentTodo] = useState(null);
   const [classCounts, setClassCounts] = useState({
     A: 0,
@@ -34,7 +35,7 @@ export default function Student() {
   };
 
   useEffect(() => {
-    fetchTodos();
+    fetchTodos();s
   }, []);
 
   const handleDelete = (id) => {
@@ -56,6 +57,7 @@ export default function Student() {
   const handleCancel = () => {
     setVisible(false);
     setCurrentTodo(null);
+    setonCancel();
   };
 
   const handleEdit = (record) => {
@@ -134,13 +136,21 @@ export default function Student() {
         <Button type="primary" onClick={showModal}>
           Add Student
         </Button>
-        <StudentForm
+        <Modal
+          title={isEdit ? "Update Student" : "Enter Student Data"}
           visible={visible}
+          onCancel={onCancel}
+          footer={null}
+        >
+          <StudentForm
+            visible={visible}
           onCancel={handleCancel}
           fetchTodos={fetchTodos}
           isEdit={isEdit}
-          currentTodo={currentTodo}
-        />
+            currentTodo={currentTodo}
+          />
+        </Modal>
+       
         <StudentTable
           data={userData}
           handleDelete={handleDelete}
