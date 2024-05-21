@@ -35,7 +35,7 @@ export default function Student() {
   };
 
   useEffect(() => {
-    fetchTodos();s
+    fetchTodos();
   }, []);
 
   const handleDelete = (id) => {
