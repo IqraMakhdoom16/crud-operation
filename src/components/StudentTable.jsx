@@ -38,8 +38,8 @@ const StudentTable = ({ data, handleDelete, handleEdit }) => {
             Edit
           </Button>
           <Popconfirm
-            title="Delete the task"
-            description="Are you sure to delete this task?"
+            title="Delete the record"
+            description="Are you sure to delete this student record?"
             onConfirm={() => handleDelete(record._id)}
             okText="Yes"
             cancelText="No"

@@ -77,7 +77,7 @@ export default function Student() {
   return (
     <div className="bg-[#f8f8f8] py-10 min-h-screen flex px-[5%] justify-center">
       <div className="container">
-        <div className="flex gap-10 mb-10">
+        <div className="flex justify-center gap-10 mb-10">
           <div className="w-44 bg-[#F0F9FF] border px-5 py-5 h-35 rounded-lg">
             <div>
               <svg
