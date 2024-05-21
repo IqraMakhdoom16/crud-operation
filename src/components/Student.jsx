@@ -133,7 +133,7 @@ export default function Student() {
             </div>
           ))}
         </div>
-        <Button type="primary" onClick={showModal}>
+        <Button type="primary" onClick={showModal} className="absolute">
           Add Student
         </Button>
         <Modal
