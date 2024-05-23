@@ -1,15 +1,16 @@
-// Student.js
 import React, { useState, useEffect } from "react";
-import { Button } from "antd";
+import {Modal, Button } from "antd";
 import axios from "axios";
 import StudentTable from "./StudentTable";
 import StudentForm from "./StudentForm";
-import EditForm from "./EditForm";
+import {Logout} from "../components/Logout";
 
 export default function Student() {
   const [userData, setUserData] = useState([]);
   const [visible, setVisible] = useState(false);
-  const [editVisible, setEditVisible] = useState(false);
+  const [onLogout, setonLogout] = useState();
+  const [isEdit, setIsEdit] = useState(false);
+  const [onCancel, setonCancel] = useState();
   const [currentTodo, setCurrentTodo] = useState(null);
   const [classCounts, setClassCounts] = useState({
     A: 0,
@@ -49,27 +50,30 @@ export default function Student() {
         console.error("Error deleting todo:", error);
       });
   };
-
+    
+  const HandleLogout = async () => {
+    try {
+      await Logout(dispatch, user);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+ 
   const showModal = () => {
     setVisible(true);
+    setIsEdit(false);
   };
 
   const handleCancel = () => {
     setVisible(false);
+    setCurrentTodo(null);
+    setonCancel();
   };
 
   const handleEdit = (record) => {
     setCurrentTodo(record);
-    setEditVisible(true);
-  };
-
-  const handleEditCancel = () => {
-    setEditVisible(false);
-  };
-
-  const handleEditSubmit = () => {
-    fetchTodos();
-    setEditVisible(false);
+    setIsEdit(true);
+    setVisible(true);
   };
 
   const totalTodos = userData.length;
@@ -82,9 +86,22 @@ export default function Student() {
 
   return (
     <div className="bg-[#f8f8f8] py-10 min-h-screen flex px-[5%] justify-center">
+      <Button
+        type="default"
+        onClick={HandleLogout}
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          marginTop: 16,
+          marginRight: 16,
+        }}
+      >
+        Logout
+      </Button>
       <div className="container">
-        <div className="flex gap-10 mb-10">
-          <div className="w-44 bg-[#F0F9FF] border px-5 py-5 h-32 rounded-lg">
+        <div className="flex justify-center gap-10 mb-10">
+          <div className="w-44 bg-[#F0F9FF] border px-5 py-5 h-35 rounded-lg">
             <div>
               <svg
                 width="48"
@@ -101,13 +118,13 @@ export default function Student() {
               <div className="text-3xl font-semibold text-[#40A3FF]">
                 {totalTodos}
               </div>
-              <div className="text-lg text-[#8db2bf]">Total Students</div>
+              <div className="text-lg text-[#8db2bf] py-3">Total Students</div>
             </div>
           </div>
           {classNames.map((classItem) => (
             <div
               key={classItem.name}
-              className="h-32 px-5 py-5 border rounded-lg w-44"
+              className="px-5 py-5 border rounded-lg h-35 w-44"
               style={{ backgroundColor: classItem.bgColor }}
             >
               <div>
@@ -139,20 +156,24 @@ export default function Student() {
             </div>
           ))}
         </div>
-        <Button type="primary" onClick={showModal}>
+        <Button type="primary" onClick={showModal} className="absolute">
           Add Student
         </Button>
-        <StudentForm
+        <Modal
+          title={isEdit ? "Update Student" : "Enter Student Data"}
           visible={visible}
+          onCancel={onCancel}
+          footer={null}
+        >
+          <StudentForm
+            visible={visible}
           onCancel={handleCancel}
           fetchTodos={fetchTodos}
-        />
-        <EditForm
-          visible={editVisible}
-          onCancel={handleEditCancel}
-          onSubmit={handleEditSubmit}
-          currentTodo={currentTodo}
-        />
+          isEdit={isEdit}
+            currentTodo={currentTodo}
+          />
+        </Modal>
+       
         <StudentTable
           data={userData}
           handleDelete={handleDelete}
