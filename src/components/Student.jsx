@@ -3,10 +3,12 @@ import {Modal, Button } from "antd";
 import axios from "axios";
 import StudentTable from "./StudentTable";
 import StudentForm from "./StudentForm";
+import {Logout} from "../components/Logout";
 
 export default function Student() {
   const [userData, setUserData] = useState([]);
   const [visible, setVisible] = useState(false);
+  const [onLogout, setonLogout] = useState();
   const [isEdit, setIsEdit] = useState(false);
   const [onCancel, setonCancel] = useState();
   const [currentTodo, setCurrentTodo] = useState(null);
@@ -48,7 +50,15 @@ export default function Student() {
         console.error("Error deleting todo:", error);
       });
   };
-
+    
+  const HandleLogout = async () => {
+    try {
+      await Logout(dispatch, user);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+ 
   const showModal = () => {
     setVisible(true);
     setIsEdit(false);
@@ -76,6 +86,19 @@ export default function Student() {
 
   return (
     <div className="bg-[#f8f8f8] py-10 min-h-screen flex px-[5%] justify-center">
+      <Button
+        type="default"
+        onClick={HandleLogout}
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          marginTop: 16,
+          marginRight: 16,
+        }}
+      >
+        Logout
+      </Button>
       <div className="container">
         <div className="flex justify-center gap-10 mb-10">
           <div className="w-44 bg-[#F0F9FF] border px-5 py-5 h-35 rounded-lg">
