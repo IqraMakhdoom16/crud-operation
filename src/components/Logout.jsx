@@ -1,20 +1,17 @@
-
-import axios from "axios";
 import { logout } from "../components/appSlice";
 
+const getToken = () => {
+    return localStorage.getItem("access_token");
+};
 
 export const Logout = async (dispatch, user) => {
-    try {
+    const token = getToken();
 
-        await axios.post(`https://api.freeapi.app/#/%F0%9F%94%90%20Authentication/logoutUser/`, {
-            refresh_token: getRefresh()
-        }, );
+    console.log(user, token, "details");
 
+    setTimeout(() => {
         localStorage.clear();
-
         dispatch(logout());
-    } catch (error) {
-        throw error;
-    }
-}
-
+        console.log("Logged out successfully after timeout");
+    }, 2000); 
+};

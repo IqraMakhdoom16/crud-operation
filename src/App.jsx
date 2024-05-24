@@ -5,16 +5,20 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import './App.css'
 import SignIn from './components/SignIn'
 import Student from "./components/Student";
+import { useSelector } from "react-redux";
 
 function App() {
 
+  const { user } = useSelector((state) => state.app);
   return (
     <>
-    <Routes>
-      <Route path="/" element={<SignIn/>} />
-      <Route path="/student-table" element={<Student/>} />
-      <Route path="*" element={<Navigate to={"/"} replace />} />
-    </Routes>
+      <Routes>
+        <Route path="/" element={<SignIn />} />
+        {user && (
+          <Route path="/student-table" element={<Student />} />
+        )}
+        <Route path="*" element={<Navigate to={"/"} replace />} />
+      </Routes>
     </>
   )
 }

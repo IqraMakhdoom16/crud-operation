@@ -3,9 +3,13 @@ import {Modal, Button } from "antd";
 import axios from "axios";
 import StudentTable from "./StudentTable";
 import StudentForm from "./StudentForm";
-import {Logout} from "../components/Logout";
+import {Logout} from "./Logout"
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 export default function Student() {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.app);
   const [userData, setUserData] = useState([]);
   const [visible, setVisible] = useState(false);
   const [onLogout, setonLogout] = useState();
@@ -53,6 +57,7 @@ export default function Student() {
     
   const HandleLogout = async () => {
     try {
+      console.log(user);
       await Logout(dispatch, user);
     } catch (err) {
       console.log(err);

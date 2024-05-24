@@ -42,3 +42,4 @@ export const {login, logout, setError, start, stop, setUser, sidebar, setCurrent
   appSlice.actions;
 
 export default appSlice.reducer;
+
